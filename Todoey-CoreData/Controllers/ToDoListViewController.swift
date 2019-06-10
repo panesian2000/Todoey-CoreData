@@ -7,11 +7,22 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController {
-
+    
+    //MARK: Local global variables
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
+    
+    //MARK: Tableview datasource methods
+    
+    //MARK: Tableview delegate methods
+    
+    //MARK: Barbutton methods
+    
+    //MARK: Manipulate data methods
 
 }
