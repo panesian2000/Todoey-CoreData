@@ -50,8 +50,6 @@ class ToDoListViewController: UITableViewController {
         cell.accessoryType = item.completed ? .checkmark : .none
         
         SavingData()
-        
-        tableView.reloadData()
     }
     
     //MARK: Barbutton methods
@@ -69,8 +67,6 @@ class ToDoListViewController: UITableViewController {
                     
                     self.itemArray.append(item)
                     self.SavingData()
-                    
-                    self.tableView.reloadData()
                 }
             }
         }
@@ -94,21 +90,44 @@ class ToDoListViewController: UITableViewController {
     func SavingData() {
         do {
             try context.save()
+            tableView.reloadData()
         }
         catch {
             print("Error saving data into core data, \(error)")
         }
     }
     
-    func LoadingData() {
-        let request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest()
-        
+    func LoadingData(with request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest()) {
         do {
             itemArray = try context.fetch(request)
+            tableView.reloadData()
         }
         catch {
             print("Error loading data from core data, \(error)")
         }
     }
 
+}
+
+extension ToDoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<ToDoItem> = ToDoItem.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        LoadingData(with: request)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            LoadingData()
+            
+            // Execute the instruction on the main thread immediately.
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+    
 }
